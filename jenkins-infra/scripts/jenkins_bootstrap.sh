@@ -81,7 +81,7 @@ export JENKINS_HOME="$HOME/webpage_ws/jenkins"
 mkdir -p "$JENKINS_HOME"
 
 JENKINS_FILE="$HOME/jenkins.war"
-JENKINS_VERSION="2.479.3"
+JENKINS_VERSION="2.504.3"
 JENKINS_URL_WAR="https://updates.jenkins.io/download/war/${JENKINS_VERSION}/jenkins.war"
 
 if [ ! -f "$JENKINS_FILE" ]; then
@@ -100,17 +100,37 @@ echo "Starting Jenkins..."
 LOG_FILE="$JENKINS_HOME/jenkins.log"
 PID_FILE="$JENKINS_HOME/jenkins.pid"
 
-sg docker -c "nohup java -jar '$JENKINS_FILE' >'$LOG_FILE' 2>&1 & echo \$! > '$PID_FILE'"
+if [ -n "${SLOT_PREFIX:-}" ]; then
+  sg docker -c "nohup java -jar '$JENKINS_FILE' --prefix='/${SLOT_PREFIX}/jenkins/' >'$LOG_FILE' 2>&1 & echo \$! > '$PID_FILE'"
+else
+  sg docker -c "nohup java -jar '$JENKINS_FILE' >'$LOG_FILE' 2>&1 & echo \$! > '$PID_FILE'"
+fi
 
 JENKINS_PID="$(cat "$PID_FILE")"
 sleep 5
 
-LOCAL_URL="http://localhost:8080/"
-WEBHOOK_PATH="/github-webhook/"
+if [ -n "${SLOT_PREFIX:-}" ]; then
+  LOCAL_URL="http://localhost:8080/${SLOT_PREFIX}/jenkins/"
+  WEBHOOK_PATH="/${SLOT_PREFIX}/jenkins/github-webhook/"
+else
+  LOCAL_URL="http://localhost:8080/"
+  WEBHOOK_PATH="/github-webhook/"
+fi
+
+CONSTRUCT_URL=""
+CONSTRUCT_WEBHOOK=""
+if [ -n "${SLOT_PREFIX:-}" ] && curl -s --fail --max-time 2 http://169.254.169.254/latest/meta-data/instance-id >/dev/null 2>&1; then
+  INSTANCE_ID=$(curl -s http://169.254.169.254/latest/meta-data/instance-id)
+  CONSTRUCT_URL="https://${INSTANCE_ID}.robotigniteacademy.com/${SLOT_PREFIX}/jenkins/"
+  CONSTRUCT_WEBHOOK="https://${INSTANCE_ID}.robotigniteacademy.com/${SLOT_PREFIX}/jenkins/github-webhook/"
+fi
 
 echo ""
 echo "Jenkins started (PID: $JENKINS_PID)"
 echo "Local URL:    $LOCAL_URL"
+if [ -n "$CONSTRUCT_URL" ]; then
+  echo "Construct URL: $CONSTRUCT_URL"
+fi
 
 # ========= Optional smee.io forwarder =========
 # Set SMEE_URL env var before running this script to enable it.
@@ -136,8 +156,12 @@ STATE_FILE="$HOME/jenkins_pid_url.txt"
   echo "To stop Jenkins:   kill $JENKINS_PID"
   echo "Log file:          $LOG_FILE"
   echo ""
-  echo "Jenkins URL:       $LOCAL_URL"
-  echo "Webhook URL:       http://localhost:8080${WEBHOOK_PATH}"
+  echo "Local Jenkins URL: $LOCAL_URL"
+  if [ -n "$CONSTRUCT_URL" ]; then
+    echo "Construct URL:     $CONSTRUCT_URL"
+    echo "Construct Webhook: $CONSTRUCT_WEBHOOK"
+  fi
+  echo "Local Webhook URL: http://localhost:8080${WEBHOOK_PATH}"
   if [ -n "$SMEE_PID" ]; then
     echo ""
     echo "To stop smee:      kill $SMEE_PID"
@@ -151,4 +175,8 @@ STATE_FILE="$HOME/jenkins_pid_url.txt"
 echo ""
 echo "Details saved to: $STATE_FILE"
 echo "Initial admin password:  cat $JENKINS_HOME/secrets/initialAdminPassword"
-echo "Done! Open $LOCAL_URL in your browser to complete setup."
+if [ -n "$CONSTRUCT_URL" ]; then
+  echo "Done! Open $CONSTRUCT_URL in your browser to complete setup."
+else
+  echo "Done! Open $LOCAL_URL in your browser to complete setup."
+fi

@@ -9,7 +9,7 @@ set -euo pipefail
 
 JENKINS_HOME="${JENKINS_HOME:-$HOME/webpage_ws/jenkins}"
 JENKINS_FILE="${JENKINS_FILE:-$HOME/jenkins.war}"
-JENKINS_VERSION="${JENKINS_VERSION:-2.479.3}"
+JENKINS_VERSION="${JENKINS_VERSION:-2.504.3}"
 
 PLUGINS_FILE="${PLUGINS_FILE:-jenkins-infra/jenkins/plugins.txt}"
 PLUGINS_MARKER="${PLUGINS_MARKER:-$JENKINS_HOME/.plugins_installed_${JENKINS_VERSION}}"

@@ -1,4 +1,44 @@
 # Instructions
+
+## Jenkins Setup & Start
+
+### First session only
+```bash
+# 1. Start Jenkins (also installs Java + downloads WAR if missing)
+cd ~/simulation_ws/src/ros1_ci
+bash jenkins-infra/scripts/jenkins_bootstrap.sh
+
+# 2. Install plugins (only needed once — skipped automatically on future runs)
+bash jenkins-infra/scripts/install_plugins.sh
+
+# 3. Get your browser URL
+jenkins_address
+
+# 4. Get the initial admin password
+cat ~/webpage_ws/jenkins/secrets/initialAdminPassword
+```
+Open the Construct URL in your browser and complete the Jenkins setup wizard.
+
+### Every session after (Jenkins restart)
+```bash
+# Kill previous Jenkins process first (get PID from jenkins_pid_url.txt)
+kill $(cat ~/webpage_ws/jenkins/jenkins.pid)
+
+# Then restart
+cd ~/simulation_ws/src/ros1_ci
+bash jenkins-infra/scripts/jenkins_bootstrap.sh
+```
+Jenkins URL for the new session: run `jenkins_address` again (URL changes each session).
+
+### Restart Jenkins mid-session (after config changes)
+```bash
+kill $(cat ~/webpage_ws/jenkins/jenkins.pid)
+cd ~/simulation_ws/src/ros1_ci
+bash jenkins-infra/scripts/jenkins_bootstrap.sh
+```
+
+---
+
 ## build notiec gazebo
 ```bash
 cd ~/simulation_ws/src/
