@@ -10,8 +10,8 @@
   <node pkg="tortoisebot_waypoints" type="tortoisebot_action_server.py" name="tortoisebot_as" />
 
   <!-- Pass Condition -->
-  <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_reached.py" />
+  <!-- <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_reached.py" /> -->
   <!-- Fail condition -->
-  <!-- <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_fail.py" /> -->
+  <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_fail.py" />
   
 </launch>
