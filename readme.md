@@ -33,6 +33,29 @@ docker push tesarect/karthikeyanbalasubramanian-cp22:tortoisebot-noetic-gazebo-v
 
 ---
 
+## Switching Between Pass and Fail Test Cases
+
+The test case is controlled by one file:
+`tortoisebot/tortoisebot_waypoints/test/waypoints_test.test`
+
+**To run the PASS test** (robot reaches goal — build succeeds):
+```xml
+<test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_reached.py" />
+<!-- <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_fail.py" /> -->
+```
+
+**To run the FAIL test** (robot can't reach goal in 2s — build fails intentionally):
+```xml
+<!-- <test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_reached.py" /> -->
+<test test-name="test_waypoints" pkg="tortoisebot_waypoints" type="test_waypoints_fail.py" />
+```
+
+After editing the file, commit and push, then open a new PR to trigger the pipeline.
+
+> Currently set to: **PASS**
+
+---
+
 ## Instructions (For Evaluators)
 
 ### Prerequisites
