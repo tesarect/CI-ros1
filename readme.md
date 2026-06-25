@@ -56,7 +56,7 @@ After editing the file, commit and push, then open a new PR to trigger the pipel
 
 ---
 
-## Instructions (For Evaluators)
+## Instructions (For Evaluation)
 
 ### Prerequisites
 - The Construct cloud machine with ROS Noetic workspace at `~/simulation_ws`
@@ -77,6 +77,17 @@ jenkins_address
 
 Open the URL in your browser and log in with the admin credentials.
 
+### Step 2 — Chnages to switch between pass and fail case
+
+Make the changes on the main (`.test` file) and push it to construct or directly on the constructs main.
+
+Once the pass or fail is switched based on the scenario, make a dummy commit on the branch to trigger the pipeline
+```bash
+git checkout jenkins-trigger
+git commit --allow-empty -m "trigger fail case"
+git push origin jenkins-trigger
+```
+
 ### Step 2 — Trigger a Pull Request
 
 On GitHub → `ros1_ci` repo → **Add file → Create new file** on a new branch → open a Pull Request against master.
@@ -87,6 +98,6 @@ Jenkins will trigger automatically within 1 minute.
 
 - Open Jenkins in browser → `ros1-ci` pipeline → click the PR build
 - **Console Output** shows Gazebo launching and waypoints test running
-- Build result: **SUCCESS**
+- Build result: **SUCCESS/FAILURE**
 
 ---
